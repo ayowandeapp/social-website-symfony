@@ -15,3 +15,7 @@ btn.addEventListener('click', ()=>{
   nav.classList.toggle("hidden");
 
 })
+
+import Alpine from 'alpinejs';
+window.Alpine = Alpine;
+Alpine.start();
