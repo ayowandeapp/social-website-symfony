@@ -4,7 +4,8 @@
 		<meta charset="UTF-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1"/>
 		<title>
-			{% block title %}Welcome!
+			{% block title %}
+            Welcome to our blog
 			{% endblock %}
 		</title>
 		{% block stylesheets %}
@@ -50,7 +51,7 @@
 					</svg>
 
 					<div class="text-3xl hidden md:block tracking-tight text-gray-600 font-medium ml-2">
-						<a href="/">SymfonyMicroBlog</a>
+						<a href="{{ path('posts.index')}}">SymfonyMicroBlog</a>
 					</div>
 
 					<div class="ml-4">
@@ -75,11 +76,7 @@
 					<p>Logged as:
 						<a class="hover:text-stone-500" href="{{ path('app_dashboard') }}">John Smith</a>
 					</p>
-					<form method="POST" action="/">
-						<button type="submit" class="tracking-widest hover:text-stone-500">
-							Logout
-						</button>
-					</form>
+					{{ include('_logout_form.html.twig') }}
 					<a href="{{ path('posts.new') }}" class="inline font-bold text-sm px-6 py-2 text-white rounded-full bg-red-500 hover:bg-red-600">
 						New blog post</a>
 
@@ -103,11 +100,8 @@
 					<p>Logged as:
 						<a class="hover:text-stone-500" href="/">John Doe</a>
 					</p>
-					<form method="POST" action="/">
-						<button type="submit" class="tracking-widest hover:text-stone-500">
-							Logout
-						</button>
-					</form>
+
+                    {{ include('_logout_form.html.twig') }}
 					<a href="{{ path('posts.new') }}" class="inline font-bold text-sm px-6 py-2 text-white rounded-full bg-red-500 hover:bg-red-600">
 						New blog post</a>
 					<a class="tracking-widest hover:text-stone-500" href="/">Login</a>
