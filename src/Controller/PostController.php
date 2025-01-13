@@ -39,6 +39,8 @@ class PostController extends AbstractController
     #[Route('/toggleFollow/{user}', name: 'toggleFollow', methods: ['GET'])]
     public function toggleFollow(int $user): Response
     {
+
+        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
         return new Response(
             'toggle follow ' . $this->generateUrl('toggleFollow')
         );
@@ -54,11 +56,12 @@ class PostController extends AbstractController
         // $this->em->persist($post);
         // $this->em->flush();
         // return new Response('Saved new Post wit Id' . $post->getId());
+        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
         return $this->render('post/new.html.twig');
 
     }
 
-    #[Route('/post/{id}/{_locale?}', name: 'posts.show', methods: ['GET'])]
+    #[Route('/post/{id}/', name: 'posts.show', methods: ['GET'])]
     public function show(int $id): Response
     {
         return $this->render('post/show.html.twig');
@@ -69,6 +72,7 @@ class PostController extends AbstractController
     public function edit(int $id): Response
     {
         // return $this->redirectToRoute('posts.index');
+        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
 
         return $this->render('post/edit.html.twig');
 
@@ -77,6 +81,7 @@ class PostController extends AbstractController
     #[Route('/post/{id}/delete', name: 'posts.delete', methods: ['POST'])]
     public function delete(int $id): Response
     {
+        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
         return new Response(
             'deleted successfully'
         );
