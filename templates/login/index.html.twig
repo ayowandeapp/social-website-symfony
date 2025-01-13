@@ -14,6 +14,8 @@
 			{% endif %}
 
 			<form action="{{ path('app_login') }}" method="post">
+                <input type="hidden" name="_csrf_token" data-controller="csrf-protection" value="{{ csrf_token('authenticate') }}">
+
 				<div class="mb-6">
 					<label class="block text-gray-800 required" for="username">Email</label>
 					<input class="border rounded-md" type="text" id="username" name="_username" value="{{ last_username }}">

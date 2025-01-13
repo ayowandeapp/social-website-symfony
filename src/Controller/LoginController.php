@@ -6,6 +6,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
+use Symfony\Bundle\SecurityBundle\Security;
 
 final class LoginController extends AbstractController
 {
@@ -22,5 +23,17 @@ final class LoginController extends AbstractController
             'last_username' => $lastUsername,
             'error' => $error,
         ]);
+    }
+
+    #[Route('/logout', name: 'app_logout')]
+    public function logout(Security $security): Response
+    {
+        // logout the user in on the current firewall
+        $response = $security->logout();
+
+        // you can also disable the csrf logout
+        $response = $security->logout(false);
+
+        return $this->redirectToRoute('posts.index');
     }
 }
