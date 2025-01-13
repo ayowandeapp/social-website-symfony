@@ -2,16 +2,22 @@
 
 namespace App\Controller;
 
+use App\Entity\Post;
+use DateTime;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
 class PostController extends AbstractController
 {
-    #[Route('/{_locale?}', name: 'posts.index', methods: ['GET'])]
+    public function __construct(private EntityManagerInterface $em)
+    {
+    }
+    #[Route('/', name: 'posts.index', methods: ['GET'])]
     public function index(): Response
     {
-        return $this->render('post/index.html.twig');
+        return $this->render('post/index.html.twig', );
         // return new Response(
         //     'list all posts ' . $this->generateUrl('posts.index')
         // );
@@ -41,6 +47,13 @@ class PostController extends AbstractController
     #[Route('/post/new', name: 'posts.new', methods: ['GET', 'POST'])]
     public function new(): Response
     {
+        // $post = new Post;
+        // $post->setTitle('Title1');
+        // $post->setContent('contents1');
+        // $post->setCreatedAt(new \DateTimeImmutable());
+        // $this->em->persist($post);
+        // $this->em->flush();
+        // return new Response('Saved new Post wit Id' . $post->getId());
         return $this->render('post/new.html.twig');
 
     }
