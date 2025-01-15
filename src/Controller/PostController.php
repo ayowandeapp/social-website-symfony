@@ -3,9 +3,11 @@
 namespace App\Controller;
 
 use App\Entity\Post;
+use App\Form\PostType;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
@@ -47,17 +49,35 @@ class PostController extends AbstractController
     }
 
     #[Route('/post/new', name: 'posts.new', methods: ['GET', 'POST'])]
-    public function new(): Response
+    public function new(Request $request): Response
     {
-        // $post = new Post;
-        // $post->setTitle('Title1');
-        // $post->setContent('contents1');
-        // $post->setCreatedAt(new \DateTimeImmutable());
-        // $this->em->persist($post);
-        // $this->em->flush();
-        // return new Response('Saved new Post wit Id' . $post->getId());
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
-        return $this->render('post/new.html.twig');
+
+        $post = new Post;
+        // $post->setTitle('Write a post');
+        // $post->setContent('');
+
+        $form = $this->createForm(PostType::class, $post);
+
+
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
+            // $form->getData() holds the submitted values
+            // but, the original `$task` variable has also been updated
+            $post = $form->getData();
+            $post->setCreatedAt(new \DateTimeImmutable);
+            $post->setUpdatedAt(new \DateTimeImmutable);
+            dd($post);
+
+            $this->em->persist($post);
+            $this->em->flush();
+
+            return $this->redirectToRoute('post.index');
+        }
+        // return new Response('Saved new Post wit Id' . $post->getId());
+        return $this->render('post/new.html.twig', [
+            'form' => $form
+        ]);
 
     }
 
