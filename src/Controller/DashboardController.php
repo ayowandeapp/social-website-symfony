@@ -7,12 +7,16 @@ use App\Form\ChangePasswordFormType;
 use App\Form\DeleteAccountType;
 use App\Form\ImageFormType;
 use App\Form\UserFormType;
+use App\Services\FileUploader;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Bundle\SecurityBundle\Security;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\String\Slugger\SluggerInterface;
 
 class DashboardController extends AbstractController
 {
@@ -27,10 +31,12 @@ class DashboardController extends AbstractController
         ]);
     }
 
-
     #[Route('/dashboard/profile', name: 'app_profile')]
-    public function profile(Request $request, Security $security): Response
-    {
+    public function profile(
+        Request $request,
+        Security $security,
+        FileUploader $fileUploader
+    ): Response {
         $user = $this->getUser();
 
         $image = new Image;
@@ -38,10 +44,17 @@ class DashboardController extends AbstractController
 
         $imageForm->handleRequest($request);
         if ($imageForm->isSubmitted() && $imageForm->isValid()) {
-            // $form->getData() holds the submitted values
-            // but, the original `$task` variable has also been updated
-            // $image = $imageForm->getData();
-            $image->setPath($imageForm->get('imageFile')->getData()->getClientOriginalName());
+
+            $file = $imageForm->get('imageFile')->getData();
+            if ($file) {
+                [$newFilename, $targetDirectory] = $fileUploader->upload($file, $user);
+
+                if ($user->getImage()?->getPath()) {
+                    unlink($targetDirectory . '/' . $user->getImage()?->getPath());
+                }
+                $image->setPath($newFilename);
+            }
+
 
             if ($user->getImage()) {
                 $this->em->remove($user->getImage());

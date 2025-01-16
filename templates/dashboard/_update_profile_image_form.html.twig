@@ -5,15 +5,17 @@
     <p class="mt-1 text-sm text-gray-600">Update your profile image</p>
   </header>
 
-  <img src="http://localhost:8000/images/test-image.png" alt="profile image" />
+  <img src="{{ asset('uploads/'~app.user.image.path ?? '')}}"
+    alt="profile image"
+    style="width: 100px; height: 100%;" />
 
     {{ form_start(imageForm, {'attr': {'class': 'p-4'}})}}
 
     <label class="block mb-4">
       <span class="sr-only">Choose File</span>
         {{ form_widget(imageForm.imageFile, {'attr': {'class': 'block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4
-        file:rounded-full file:border-0 file:text-sm file:font-semibold
-        file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100'}})
+            file:rounded-full file:border-0 file:text-sm file:font-semibold
+            file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100'}})
         }}
         {{ form_errors(imageForm.imageFile, {'attr': {'class': 'text-red-500 text-xs italic'}}) }}
 
