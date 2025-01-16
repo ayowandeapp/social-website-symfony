@@ -18,13 +18,13 @@ class Post
 
     #[Assert\NotBlank]
     #[Assert\Type('string')]
-    #[Assert\Length(max: 20, maxMessage: 'Title too long')]
+    #[Assert\Length(max: 100, maxMessage: 'Title too long')]
     #[ORM\Column(length: 255)]
     private ?string $title = null;
 
     #[Assert\NotBlank]
     #[Assert\Type('string')]
-    #[Assert\Length(max: 1000, maxMessage: 'Content too long')]
+    #[Assert\Length(max: 4000, maxMessage: 'Content too long')]
     #[ORM\Column(type: Types::TEXT)]
     private ?string $content = null;
 
@@ -33,6 +33,10 @@ class Post
 
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $updated_at = null;
+
+    #[ORM\ManyToOne(inversedBy: 'posts')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?User $user = null;
 
     public function getId(): ?int
     {
@@ -83,6 +87,18 @@ class Post
     public function setUpdatedAt(?\DateTimeImmutable $updated_at): static
     {
         $this->updated_at = $updated_at;
+
+        return $this;
+    }
+
+    public function getUser(): ?User
+    {
+        return $this->user;
+    }
+
+    public function setUser(?User $user): static
+    {
+        $this->user = $user;
 
         return $this;
     }

@@ -10,6 +10,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use User;
 
 class PostController extends AbstractController
 {
@@ -17,23 +18,30 @@ class PostController extends AbstractController
     {
     }
     #[Route('/', name: 'posts.index', methods: ['GET'])]
-    public function index(): Response
+    public function index(Request $request): Response
     {
-        return $this->render('post/index.html.twig', );
+        $posts = $this->em->getRepository(Post::class)
+            ->findAllPosts(
+                $request->query->getInt('page', 1), /* page number */
+                10 /* limit per page */
+            );
+        return $this->render('post/index.html.twig', ['posts' => $posts]);
         // return new Response(
         //     'list all posts ' . $this->generateUrl('posts.index')
         // );
     }
 
-    #[Route('/posts/user/{id}', name: 'posts.user', methods: ['GET'])]
-    public function user(int $id): Response
+    #[Route('/posts/user/{user}', name: 'posts.user', methods: ['GET'])]
+    public function user(Request $request, int $user): Response
     {
+        $posts = $this->em->getRepository(Post::class)
+            ->findAllUserPosts(
+                $request->query->getInt('page', 1), /* page number */
+                10, /* limit per page */
+                $user
+            );
+        return $this->render('post/index.html.twig', ['posts' => $posts]);
 
-        return $this->render('post/index.html.twig');
-
-        // return new Response(
-        //     'list user all posts ' . $this->generateUrl('posts.user')
-        // );
 
     }
 
@@ -54,9 +62,6 @@ class PostController extends AbstractController
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
 
         $post = new Post;
-        // $post->setTitle('Write a post');
-        // $post->setContent('');
-
         $form = $this->createForm(PostType::class, $post);
 
 
@@ -65,14 +70,13 @@ class PostController extends AbstractController
             // $form->getData() holds the submitted values
             // but, the original `$task` variable has also been updated
             $post = $form->getData();
+            $post->setUser($this->getUser());
             $post->setCreatedAt(new \DateTimeImmutable);
             $post->setUpdatedAt(new \DateTimeImmutable);
-            dd($post);
-
             $this->em->persist($post);
             $this->em->flush();
 
-            return $this->redirectToRoute('post.index');
+            return $this->redirectToRoute('posts.index');
         }
         // return new Response('Saved new Post wit Id' . $post->getId());
         return $this->render('post/new.html.twig', [
@@ -81,10 +85,13 @@ class PostController extends AbstractController
 
     }
 
-    #[Route('/post/{id}/', name: 'posts.show', methods: ['GET'])]
-    public function show(int $id): Response
+    #[Route('/post/{post}/', name: 'posts.show', methods: ['GET'])]
+    public function show(Post $post): Response
     {
-        return $this->render('post/show.html.twig');
+        // dd($post->getUser()->getName());
+        return $this->render('post/show.html.twig', [
+            'post' => $post
+        ]);
 
     }
 
@@ -98,27 +105,26 @@ class PostController extends AbstractController
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
 
-            $post = $form->getData();
-            $post->setUpdatedAt(new \DateTimeImmutable);
+            $editPost = $form->getData();
+            $editPost->setUpdatedAt(new \DateTimeImmutable);
 
-            dd($post);
-
-            $this->em->persist($post);
+            $this->em->persist($editPost);
             $this->em->flush();
-            return $this->redirectToRoute('post.index');
+            return $this->redirectToRoute('posts.index');
         }
 
         return $this->render('post/edit.html.twig', ['form' => $form]);
 
     }
 
-    #[Route('/post/{id}/delete', name: 'posts.delete', methods: ['POST'])]
-    public function delete(int $id): Response
+    #[Route('/post/{post}/delete', name: 'posts.delete', methods: ['POST'])]
+    public function delete(Post $post): Response
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
-        return new Response(
-            'deleted successfully'
-        );
+        $this->em->remove($post);
+        $this->em->flush();
+
+        return $this->redirectToRoute('posts.index');
 
     }
 

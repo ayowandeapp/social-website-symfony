@@ -24,12 +24,15 @@
         }})
     }}
 
+    {% for message in app.flashes('image-notice') %}
       <p
         x-data="{show: true}"
         x-show="show"
         x-transition
         x-init="setTimeout(()=> show=false, 2000)"
-        class="text-sm text-gray-600" >Saved</p>
+        class="text-sm text-gray-600" >{{message}}</p>
+    {% endfor %}
+
   {{ form_end(imageForm) }}
   {# <form action="{{ path('app_profile') }}" method="POST" class="p-4" enctype="multipart/form-data">
     <label class="block mb-4">
