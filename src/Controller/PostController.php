@@ -88,13 +88,27 @@ class PostController extends AbstractController
 
     }
 
-    #[Route('/post/{id}/edit', name: 'posts.edit', methods: ['GET', 'POST'])]
-    public function edit(int $id): Response
+    #[Route('/post/{post}/edit', name: 'posts.edit', methods: ['GET', 'POST'])]
+    public function edit(Request $request, Post $post): Response
     {
-        // return $this->redirectToRoute('posts.index');
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
 
-        return $this->render('post/edit.html.twig');
+        $form = $this->createForm(PostType::class, $post);
+
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
+
+            $post = $form->getData();
+            $post->setUpdatedAt(new \DateTimeImmutable);
+
+            dd($post);
+
+            $this->em->persist($post);
+            $this->em->flush();
+            return $this->redirectToRoute('post.index');
+        }
+
+        return $this->render('post/edit.html.twig', ['form' => $form]);
 
     }
 
